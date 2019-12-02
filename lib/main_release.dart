@@ -25,7 +25,7 @@ void main() async {
   runZoned<Future<Null>>(() async {
     var configuredApp = AppSettings(
       appName: 'Tyba',
-      projectId: 'tyba-25cb9',
+      projectId: 'ae60251ccbf77ccc1ba924d45b7a553e',
       collectionId: 'jjNviT7M0LSYycHSKDOv',
       releaseMode: !isInDebugMode,
       child: MaterialApp(

@@ -37,6 +37,38 @@ Prueba tecnica fron tyba
  - lib/main_development.dart
  - lib/main_production.dart
 
+ ## Debugger config
+
+ Vscode config
+
+ ```json
+ {
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "development",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": [
+                "--flavor",
+                "development"
+              ]
+        },
+        {
+            "name": "release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_release.dart",
+            "args": [
+                "--flavor",
+                "production"
+              ]
+        }
+    ]
+}
+```
+
 Thanks
 ------
 
