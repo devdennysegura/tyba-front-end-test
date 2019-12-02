@@ -37,6 +37,11 @@ Prueba tecnica fron tyba
  - lib/main_development.dart
  - lib/main_production.dart
 
+### Run development mode
+```bash
+ - flutter run -t lib/main_development.dart --flavor development
+ ```
+
  ## Debugger config
 
  Vscode config
