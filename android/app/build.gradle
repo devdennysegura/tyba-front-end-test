@@ -1,0 +1,147 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+def devKeyProperties = new Properties()
+def devKeyPropertiesFile = rootProject.file('development.properties')
+if (devKeyPropertiesFile.exists()) {
+    devKeyProperties.load(new FileInputStream(devKeyPropertiesFile))
+}
+def productionKeyProperties = new Properties()
+def productionKeyPropertiesFile = rootProject.file('release.properties')
+if (productionKeyPropertiesFile.exists()) {
+    productionKeyProperties.load(new FileInputStream(productionKeyPropertiesFile))
+}
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+    compileSdkVersion 28
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.tyba.fronttest.dev"
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        pickFirst 'lib/x86_64/libapp.so'
+        pickFirst 'lib/armeabi/libapp.so'
+        pickFirst 'lib/x86/libapp.so'
+        pickFirst 'lib/armeabi-v7a/libapp.so'
+        pickFirst 'lib/arm64-v8a/libapp.so'
+    }
+
+    flavorDimensions "app"
+
+    signingConfigs {
+        development {
+            if (System.getenv()["CI"]) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            } else {
+                storeFile file(devKeyProperties['storeFile'])
+                storePassword devKeyProperties['storePassword']
+                keyAlias devKeyProperties['keyAlias']
+                keyPassword devKeyProperties['keyPassword']
+            }
+        }
+        production {
+            if (System.getenv()["CI"]) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            } else {
+                storeFile file(productionKeyProperties['storeFile'])
+                storePassword productionKeyProperties['storePassword']
+                keyAlias productionKeyProperties['keyAlias']
+                keyPassword productionKeyProperties['keyPassword']
+            }
+        }
+    }
+
+    productFlavors {
+        development {
+            dimension "app"
+            applicationId "com.tyba.fronttest.dev"
+            resValue "string", "app_name", "Tyba Dev"
+            resValue "string", "app_map_key", "AIzaSyC2fRd5LcoJCI4FMRhuOktUxrLQ_rai5_I"
+        }
+        production {
+            dimension "app"
+            applicationId "com.tyba.fronttest"
+            resValue "string", "app_name", "Tyba"
+            resValue "string", "app_map_key", "AIzaSyC2fRd5LcoJCI4FMRhuOktUxrLQ_rai5_I"
+        }
+    }
+
+    buildTypes {
+        debug {
+            productFlavors.development.signingConfig signingConfigs.development
+            productFlavors.production.signingConfig signingConfigs.production
+            signingConfig signingConfigs.development
+        }
+        release {
+            productFlavors.development.signingConfig signingConfigs.development
+            productFlavors.production.signingConfig signingConfigs.production
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    testImplementation "junit:junit:$junit_version"
+    androidTestImplementation "androidx.test:runner:$test_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
+    api "com.google.firebase:firebase-core:$firebase_core"
+    implementation "com.crashlytics.sdk.android:crashlytics:$crashlytics_version"
+}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'
